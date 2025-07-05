@@ -171,10 +171,8 @@ function App() {
          ))
       }
           
-          <div className='add-account'>
-          <div className='add-acc-button' onClick={addAccount}>
-            New
-          </div>
+        <div className='add-account'>
+          <img className='add-acc-button' src='../public/plus.png' onClick={addAccount} alt="plus image"/>
         </div>
           
           
