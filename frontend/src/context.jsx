@@ -14,12 +14,14 @@ export const ContextProvider = ({ children }) => {
     // 2 -> incorrect address
     // 3 -> error ocurred
     // 4 -> success
+    // 5 -> no NFTs found
 
     const [accounts, setAccounts] = useState([{
         address: "",
         id: 0,
         data: [],
-        status: 0
+        status: 0,
+        network: 0 // 0 = Sepolia, 1 = Mainnet
     }]);
 
     useEffect(() => {
@@ -38,7 +40,18 @@ export const ContextProvider = ({ children }) => {
             address: prev[index].address,
             id: prev[index].id,
             data: prev[index].data,
-            status: status
+            status: status,
+            network: prev[index].network
+        },
+        ...prev.slice(index+1)]);
+    }
+    const setAccountNetwork = (index, network) => {
+        setAccounts((prev) => [...prev.slice(0, index), {
+            address: prev[index].address,
+            id: prev[index].id,
+            data: prev[index].data,
+            status: prev[index].status,
+            network: network
         },
         ...prev.slice(index+1)]);
     }
@@ -57,6 +70,7 @@ export const ContextProvider = ({ children }) => {
                 collapsed: state
             }, ...prev[accIndex].data.slice(nftIndex+1)],
             status: prev[accIndex].status,
+            network: prev[accIndex].network
         }, ...prev.slice(accIndex+1)]);
         
     }
@@ -66,7 +80,8 @@ export const ContextProvider = ({ children }) => {
             address: "",
             id: prev[prev.length-1].id+1,
             data: null,
-            status: 0
+            status: 0,
+            network: 0
         }]);
     }
     const removeAccount = (index) => {
@@ -81,6 +96,7 @@ export const ContextProvider = ({ children }) => {
             id: prev[index].id,
             data: prev[index].data,
             status: prev[index].status,
+            network: prev[index].network
         }, ...prev.slice(index+1)]);
     }
     const setAccData = (index, data) => {
@@ -89,6 +105,7 @@ export const ContextProvider = ({ children }) => {
             id: prev[index].id,
             data: data,
             status: prev[index].status,
+            network: prev[index].network
         }, ...prev.slice(index+1)]);
     }
 
@@ -98,8 +115,9 @@ export const ContextProvider = ({ children }) => {
         try {
             const config = {
             apiKey: 'YNaf7MtOQ7bue4DBaeY8hBkuroqOc_c7',
-            network: Network.ETH_SEPOLIA,
+            network: accounts[index].network === 0 ? Network.ETH_SEPOLIA : Network.ETH_MAINNET
             };
+            console.log('using network:', accounts[index].network)
             
 
             const alchemy = new Alchemy(config);
@@ -110,10 +128,7 @@ export const ContextProvider = ({ children }) => {
 
             if (!ownedNfts.length) {
             console.log(`No NFTs found for address ${addr}`);
-            return;
-            }
-            if (ownedNfts.length > 5) {
-                ownedNfts = ownedNfts.slice(0,5);
+            return {result: 2}
             }
 
 
@@ -146,19 +161,22 @@ export const ContextProvider = ({ children }) => {
                 console.log('account data:', accounts[index].data);
                 setAccountState(index, 4);
             //console.log('image url:', metadata[id].image.cachedUrl);
-            return true;
+            return {result: 4}
 
             
 
 
 } catch (e) {
     console.log('error:', e);
-    return false;
+    return {result: 0}
 }
     }
 
+    const getAccNetwork = (index) => accounts[index].network;
+
     const value = {
-        accounts, addAccount, setData, removeAccount, setAccountState, setAccAddress, setAccountCollapse
+        accounts, addAccount, setData, removeAccount, setAccountState, setAccAddress, setAccountCollapse,
+        setAccountNetwork, getAccNetwork
     }
     return (
         <Context.Provider value={value}>{children}</Context.Provider>

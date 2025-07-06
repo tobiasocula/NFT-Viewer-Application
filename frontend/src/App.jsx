@@ -17,7 +17,11 @@ const resolveIpfsUrl = (url) => {
 
 function App() {
 
-  const {accounts, addAccount, setData, removeAccount, setAccountState, setAccAddress, setAccountCollapse} = useMyContext();
+  const {accounts, addAccount, setData, removeAccount, setAccountState, setAccAddress, setAccountCollapse,
+    setAccountNetwork, getAccNetwork
+  } = useMyContext();
+
+  const networkValues = ['Sepolia', 'Mainnet'];
 
   //const checkCollapsed = (accIndex, nftIndex) => accounts[accIndex].data[nftIndex].collapsed;
 
@@ -55,9 +59,15 @@ function App() {
                   if (!ethers.utils.isAddress(accounts[index].address)) {
                     console.log('no valid address');
                     setAccountState(index, 2)
-                  } else if (!await setData(index, acc.address)) {
+                  } else {
+                    const res = await setData(index, acc.address);
+                  if (!res.result) {
                     setAccountState(index, 3)
+                  } else if (res.result === 2) {
+                    setAccountState(index, 5)
                   }
+                  }
+                  
                 }}>
               <input className='input' type="text" value={acc.address} onChange={
                 (e) => {
@@ -66,6 +76,24 @@ function App() {
               }></input>
               <button className='form-button' type="submit">Search</button>
             </form>
+
+
+            <div className='networks-div'>
+              Select network
+              <select
+                  className="networks"
+                  value={networkValues[getAccNetwork(findAccIndex(acc.id))]}
+                  onChange={(e) => {
+              e.preventDefault();
+              const index = findAccIndex(acc.id);
+              console.log('network value index:', getAccNetwork(findAccIndex(acc.id)));
+              setAccountNetwork(index, getAccNetwork(index) === 0 ? 1 : 0);
+            }}>
+                {networkValues.map(k => (
+                  <option key={k} value={k}>{k}</option>
+                ))}
+                </select>
+              </div>
             
          
          <div className='acc-data'>
@@ -160,7 +188,7 @@ function App() {
                           ? "Loading..."
                           : acc.status === 2
                             ? "Incorrect address!"
-                            : acc.status === 3 ? "Something went wrong." : "Nothing here yet"
+                            : acc.status === 3 ? "Something went wrong." : acc.status === 5 ? "No NFTs found" : "Nothing here yet"
                         }
                       </div>
                       )}
