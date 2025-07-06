@@ -52,7 +52,7 @@ function App() {
             <form className='form' onSubmit={async (e) => {
                   e.preventDefault();
                   const index = findAccIndex(acc.id);
-                  if (!ethers.utils.isAddress(accounts[index].address)) {
+                  if (!ethers.isAddress(accounts[index].address)) {
                     console.log('no valid address');
                     setAccountState(index, 2)
                   } else if (!await setData(index, acc.address)) {
