@@ -171,7 +171,9 @@ function App() {
       }
           
         <div className='add-account'>
+          <div className='add-account-frame'>
           <img className='add-acc-button' src='/plus.png' onClick={addAccount} alt="plus image"/>
+          </div>
         </div>
           
           
