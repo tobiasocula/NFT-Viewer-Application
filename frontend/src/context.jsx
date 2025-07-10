@@ -1,5 +1,7 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import { Alchemy, Network } from 'alchemy-sdk';
+import dotenv from "dotenv";
+dotenv.config();
 
 const Context = createContext();
 
@@ -114,7 +116,7 @@ export const ContextProvider = ({ children }) => {
         setAccountState(index, 1);
         try {
             const config = {
-            apiKey: 'YNaf7MtOQ7bue4DBaeY8hBkuroqOc_c7',
+            apiKey: process.env.API_KEY,
             network: accounts[index].network === 0 ? Network.ETH_SEPOLIA : Network.ETH_MAINNET
             };
             console.log('using network:', accounts[index].network)

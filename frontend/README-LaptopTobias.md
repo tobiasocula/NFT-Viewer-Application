@@ -1,0 +1,1 @@
+Small ERC20-token viewing application, which I've made during Alchemy University's course about blockchain technology. Similar to NFT token viewing application (https://github.com/tobiasocula/NFT-Viewer-Application). Simply create account window frame, input address and view someone's NFT holdings.
